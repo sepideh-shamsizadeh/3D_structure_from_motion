@@ -33,3 +33,5 @@
 Lab2 - Structure from Motion.pdf
 datasets/
 
+.idea/
+sfm/cmake-build-debug/
