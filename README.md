@@ -1,1 +1,0 @@
-# 3D_structure_from_motion

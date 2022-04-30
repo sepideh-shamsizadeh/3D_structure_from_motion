@@ -12,7 +12,7 @@ find_package( Eigen3 REQUIRED )
 find_package( Ceres REQUIRED)
 
 #Add here your source files
-set(3DP_SFM_SRCS src/io_utils.cpp src/features_matcher.cpp src/basic_sfm.cpp)
+set(3DP_SFM_SRCS src/io_utils.cpp src/features_matcher.cpp src/basic_sfm.cpp src/camera_calibration.cpp)
 
 add_library(${PROJECT_NAME} ${3DP_SFM_SRCS})
 target_include_directories( ${PROJECT_NAME} PUBLIC

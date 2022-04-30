@@ -30,3 +30,8 @@
 *.exe
 *.out
 *.app
+.idea/
+Lab2 - Structure from Motion.pdf
+cmake-build-debug/
+datasets/
+sfm/.gitignore
