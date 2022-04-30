@@ -1,0 +1,78 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Release-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "2.8"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "sfm",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "basic_sfm::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-basic_sfm-Release-cada8057e98d0335cdcb.json",
+					"name" : "basic_sfm",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "matcher::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-matcher-Release-e94031de635f150cd0ac.json",
+					"name" : "matcher",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "sfm::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-sfm-Release-3881b4818868b0bd862f.json",
+					"name" : "sfm",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/somayeh/CLionProjects/3Dprocessing/3D_structure_from_motion/sfm/cmake-build-debug",
+		"source" : "/home/somayeh/CLionProjects/3Dprocessing/3D_structure_from_motion/sfm"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}

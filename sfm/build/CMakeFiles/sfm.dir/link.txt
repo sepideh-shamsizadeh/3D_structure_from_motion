@@ -1,0 +1,2 @@
+/usr/bin/ar qc libsfm.a  CMakeFiles/sfm.dir/src/io_utils.cpp.o CMakeFiles/sfm.dir/src/features_matcher.cpp.o CMakeFiles/sfm.dir/src/basic_sfm.cpp.o
+/usr/bin/ranlib libsfm.a

@@ -1,0 +1,5 @@
+/home/somayeh/CLionProjects/3Dprocessing/3D_structure_from_motion/sfm/build/CMakeFiles/rebuild_cache.dir
+/home/somayeh/CLionProjects/3Dprocessing/3D_structure_from_motion/sfm/build/CMakeFiles/edit_cache.dir
+/home/somayeh/CLionProjects/3Dprocessing/3D_structure_from_motion/sfm/build/CMakeFiles/basic_sfm.dir
+/home/somayeh/CLionProjects/3Dprocessing/3D_structure_from_motion/sfm/build/CMakeFiles/matcher.dir
+/home/somayeh/CLionProjects/3Dprocessing/3D_structure_from_motion/sfm/build/CMakeFiles/sfm.dir
