@@ -76,6 +76,8 @@ void FeatureMatcher::exhaustiveMatching()
     {
         for( int j = i + 1; j < images_names_.size(); j++ )
         {
+            cv:: Mat img1 = readUndistortedImage(images_names_[i]);
+            cv:: Mat img2 = readUndistortedImage(images_names_[j]);
             std::cout<<"Matching image "<<i<<" with image "<<j<<std::endl;
             std::vector<cv::DMatch> matches, inlier_matches;
             //BFMatcher matcher ( NORM_HAMMING );
@@ -88,9 +90,17 @@ void FeatureMatcher::exhaustiveMatching()
                     inlier_matches.push_back(matches[p]);
                 }
             }
+
             if(inlier_matches.size()<=10)
                 break;
 
+            cv::Mat img_matches;
+            cv::drawMatches( img1, features_[i], img2, features_[j], inlier_matches, img_matches, cv::Scalar::all(-1),
+                         cv::Scalar::all(-1), std::vector<char>(), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
+            //-- Show detected matches
+            imshow("Good Matches", img_matches );
+            cv::waitKey(0);
+            intrinsics_matrix_ = new_intrinsics_matrix_;
 
             //////////////////////////// Code to be completed (2/5) /////////////////////////////////
             // Match descriptors between image i and image j, and perform geometric validation,
@@ -102,7 +112,6 @@ void FeatureMatcher::exhaustiveMatching()
             // Do not set matches between two images if the amount of inliers matches
             // (i.e., geomatrically verified matches) is small (say <= 10 matches)
             /////////////////////////////////////////////////////////////////////////////////////////
-
             setMatches( i, j, inlier_matches);
         }
     }
