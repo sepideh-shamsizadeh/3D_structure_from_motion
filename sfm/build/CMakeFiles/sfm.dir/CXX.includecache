@@ -21,6 +21,8 @@ opencv2/imgcodecs.hpp
 /home/somayeh/CLionProjects/3Dprocessing/3D_structure_from_motion/sfm/src/opencv2/imgcodecs.hpp
 opencv2/imgproc.hpp
 /home/somayeh/CLionProjects/3Dprocessing/3D_structure_from_motion/sfm/src/opencv2/imgproc.hpp
+iostream
+/home/somayeh/CLionProjects/3Dprocessing/3D_structure_from_motion/sfm/src/iostream
 
 /home/somayeh/CLionProjects/3Dprocessing/3D_structure_from_motion/sfm/src/features_matcher.h
 string

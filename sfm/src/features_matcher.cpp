@@ -7,10 +7,14 @@
 #include "opencv2/xfeatures2d.hpp"
 #include "opencv2/imgcodecs.hpp"
 #include"opencv2/imgproc.hpp"
+#include "iostream"
 
 
 using namespace cv::xfeatures2d;
 using namespace cv;
+
+const double FOCAL_LENGTH = 4308 ; // focal length in pixels, after downsampling, guess from jpeg EXIF data
+
 
 
 namespace
@@ -100,7 +104,6 @@ void FeatureMatcher::exhaustiveMatching()
       std::cout<<"Matching image "<<i<<" with image "<<j<<std::endl;
       std::vector<cv::DMatch> matches, inlier_matches;
 
-//
         cv::Mat img_1 = readUndistortedImage(images_names_[i]);
         cv::Mat img_2 = readUndistortedImage(images_names_[j]);
 
@@ -111,18 +114,159 @@ void FeatureMatcher::exhaustiveMatching()
         Ptr<FeatureDetector> detector = ORB::create();
         Ptr<DescriptorExtractor> descriptor = ORB::create();
 
+//      Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create(DescriptorMatcher::FLANNBASED);
         Ptr<DescriptorMatcher> matcher  = DescriptorMatcher::create ( "BruteForce-Hamming" );
 
         matcher->match ( descriptors_[i], descriptors_[j], matches);
+
 //
-//
-////
-        Mat img_match;
+
+        Mat img_match,img_match_1;
         drawMatches ( img_1, features_[i], img_2, features_[j], matches, img_match );
         imshow ( "img_match", img_match );
         waitKey(0);
+
+//       drawMatches ( img_1, features_[i], img_2, features_[j], inlier_matches, img_match_1 );
+//       imshow ( "img_match_1", img_match_1 );
+//       waitKey(0);
+
+        std::vector< DMatch > good_matches;
+//        double min_dist=50, max_dist=0;
 //
+//        for ( int p = 0; p < descriptors_[p].rows; p++ )
+//        {
+//            std:: cout <<matches[p].distance<<std::endl;
+//            std:: cout <<max ( min_dist, 75.0 )<<std::endl;
+//            std:: cout <<"*******************"<<std::endl;
+//            if ( matches[p].distance <= max ( min_dist, 70.0 ) )
+//            {
+//                good_matches.push_back (matches[p]);
+//            }
+//        }
+        for (int p = 0; p < matches.size()-1; p++)
+        {
+            const float ratio = 0.4; // As in Lowe's paper; can be tuned
+            if (matches[p].distance < ratio * matches[p+1].distance)
+            {
+                good_matches.push_back(matches[p]);
+            }
+        }
+        std::cout<<good_matches.size()<<std::endl;
+
+        if(good_matches.size()<=10){
+            break;
+        }
+        Mat x;
+        std::cout<<i<<j<<std::endl;
+        std::cout<<"****************"<<std::endl;
+
+        drawMatches ( img_1, features_[i], img_2, features_[j], good_matches, x );
+        imshow ( "x", x );
+        waitKey(0);
+
+
+
+
+//        // Convert keypoints into Point2f
+        std::vector<cv::Point2f> points1,points2;
 //
+        for (std::vector<cv::DMatch>::const_iterator it = matches.begin(); it != matches.end(); ++it) {
+            // Get the position of left keypoints
+
+            float x = features_[i][it->queryIdx].pt.x;
+            float y = features_[i][it->queryIdx].pt.y;
+
+            points1.push_back(cv::Point2f(x, y));
+
+
+            // Get the position of right keypoints
+            x = features_[j][it->trainIdx].pt.x;
+            y = features_[j][it->trainIdx].pt.y;
+            points2.emplace_back(x, y);
+        }
+//
+//        // Find the essential between image 1 and image 2
+        cv::Mat inliers;
+
+        cv::Mat essential = cv::findEssentialMat(points1, points2, new_intrinsics_matrix_, cv::RANSAC, 0.9, 1.0, inliers);
+        std::cout<<essential<< std::endl;
+//
+////        // recover relative camera pose from essential matrix
+        cv::Mat rotation, translation;
+        cv::recoverPose(essential, points1, points2, new_intrinsics_matrix_, rotation, translation, inliers);
+        std::cout<<rotation<<std::endl;
+        std::cout<<translation<<std::endl;
+////
+        // compose projection matrix from R,T
+        cv::Mat projection2(3, 4, CV_64F); // the 3x4 projection matrix
+        rotation.copyTo(projection2(cv::Rect(0, 0, 3, 3)));
+        translation.copyTo(projection2.colRange(3, 4));
+////
+//        // compose generic projection matrix
+        cv::Mat projection1(3, 4, CV_64F, 0.); // the 3x4 projection matrix
+        cv::Mat diag(cv::Mat::eye(3, 3, CV_64F));
+        diag.copyTo(projection1(cv::Rect(0, 0, 3, 3)));
+////
+//        // to contain the inliers
+        std::vector<cv::Vec2d> inlierPts1;
+        std::vector<cv::Vec2d> inlierPts2;
+////
+////        // create inliers input point vector for triangulation
+        int t(0);
+        for (int l = 0; l < inliers.rows; l++) {
+            if (inliers.at<uchar>(l)) {
+                inlierPts1.push_back(cv::Vec2d(points1[l].x, points1[l].y));
+                inlierPts2.push_back(cv::Vec2d(points2[l].x, points2[l].y));
+            }
+        }
+////        // undistort and normalize the image points
+        std::vector<cv::Vec2d> points1u;
+        cv::undistortPoints(inlierPts1, points1u, new_intrinsics_matrix_, dist_coeffs_);
+        std::vector<cv::Vec2d> points2u;
+        cv::undistortPoints(inlierPts2, points2u, new_intrinsics_matrix_, dist_coeffs_);
+////
+////        // Triangulation
+////        std::vector<cv::Vec3d> points3D;
+////        triangulatePoints(projection1, projection2, points1u, points2u, points3D);
+////
+////        std::cout<<"3D points :"<<points3D.size()<<std::endl;
+//
+//        //-- Localize the object
+////        std::vector<Point2f> obj;
+////        std::vector<Point2f> scene;
+////        std::vector<int> i_kp, j_kp;
+////        std::vector<uchar> mask;
+////
+////
+//        Mat H = findHomography( points1u, points2u, RANSAC );
+////
+////
+////        //-- Get the corners from the image_1 ( the object to be "detected" )
+//        std::vector<Point2f> obj_corners(4);
+//        obj_corners[0] = Point2f(0, 0);
+//        obj_corners[1] = Point2f( (float)img_1.cols, 0 );
+//        obj_corners[2] = Point2f( (float)img_1.cols, (float)img_1.rows );
+//        obj_corners[3] = Point2f( 0, (float)img_1.rows );
+//        std::vector<Point2f> scene_corners(4);
+//        perspectiveTransform( obj_corners, scene_corners, H);
+//
+//        //-- Draw lines between the corners (the mapped object in the scene - image_2 )
+//        line( img_match, scene_corners[0] + Point2f((float)img_1.cols, 0),
+//              scene_corners[1] + Point2f((float)img_1.cols, 0), Scalar(0, 255, 0), 4 );
+//        line( img_match, scene_corners[1] + Point2f((float)img_1.cols, 0),
+//              scene_corners[2] + Point2f((float)img_1.cols, 0), Scalar( 0, 255, 0), 4 );
+//        line( img_match, scene_corners[2] + Point2f((float)img_1.cols, 0),
+//              scene_corners[3] + Point2f((float)img_1.cols, 0), Scalar( 0, 255, 0), 4 );
+//        line( img_match, scene_corners[3] + Point2f((float)img_1.cols, 0),
+//              scene_corners[0] + Point2f((float)img_1.cols, 0), Scalar( 0, 255, 0), 4 );
+//
+////
+//        //-- Show detected matches
+//        imshow("Good Matches & Object detection", img_match );
+//        waitKey(0);
+
+
+
 ////
 
         //////////////////////////// Code to be completed (2/5) /////////////////////////////////
@@ -137,6 +281,7 @@ void FeatureMatcher::exhaustiveMatching()
       /////////////////////////////////////////////////////////////////////////////////////////
 
       setMatches( i, j, inlier_matches);
+
     }
   }
 }
