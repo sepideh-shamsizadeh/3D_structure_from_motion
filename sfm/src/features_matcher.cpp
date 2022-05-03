@@ -53,13 +53,12 @@ void FeatureMatcher::extractFeatures()
     {
         std::cout<<"Computing descriptors for image "<<i<<std::endl;
         cv::Mat img = readUndistortedImage(images_names_[i]);
-        std::vector<cv::KeyPoint> keypoints;
-        detector->detect ( img,keypoints );
-        descriptor->compute( img, keypoints, descriptors_[i] );
+        detector->detect ( img,features_[i] );
+        descriptor->compute( img, features_[i], descriptors_[i] );
         cv::Mat outimg1;
-        drawKeypoints( img, keypoints, outimg1, cv::Scalar::all(-1), cv::DrawMatchesFlags::DEFAULT );
-        imshow("ORB",outimg1);
-        cv::waitKey(0);
+        drawKeypoints( img, features_[i], outimg1, cv::Scalar::all(-1), cv::DrawMatchesFlags::DEFAULT );
+        cv::Vec3b color = img.at<cv::Vec3b>(features_[i].data()->pt.x, features_[i].data()->pt.y);
+        feats_colors_[i].push_back(color);
 
         //////////////////////////// Code to be completed (1/1) /////////////////////////////////
         // Extract salient points + descriptors from i-th image, and store them into
@@ -81,6 +80,15 @@ void FeatureMatcher::exhaustiveMatching()
             std::vector<cv::DMatch> matches, inlier_matches;
             //BFMatcher matcher ( NORM_HAMMING );
             matcher->match ( descriptors_[i], descriptors_[j], matches );
+            for (int p = 0; p < matches.size(); ++p)
+            {
+                const float ratio = 0.8; // As in Lowe's paper; can be tuned
+                if (matches[p].distance < ratio * matches[p+1].distance)
+                {
+                    inlier_matches.push_back(matches[p]);
+                }
+            }
+
 
             //////////////////////////// Code to be completed (2/5) /////////////////////////////////
             // Match descriptors between image i and image j, and perform geometric validation,

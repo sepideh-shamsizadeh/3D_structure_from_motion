@@ -31,7 +31,7 @@ int main()
     // Extracting path of individual image stored in a given directory
     std::vector<cv::String> images;
     // Path of the folder containing checkerboard images
-    std::string path = "../images/*.png";
+    std::string path = "../images/*.jpg";
 
     cv::glob(path, images);
 
@@ -94,16 +94,14 @@ int main()
 
     cv::imshow("original image", imageUndistorted);
     cv::waitKey(0);
-    std::string filename = "../../configs/parameters.yml";
+    std::string filename = "../../configs/3dp_cam.yml";
     { //write
         cv::FileStorage fs(filename, cv::FileStorage::WRITE);
         // or:
         // FileStorage fs;
         // fs.open(filename, FileStorage::WRITE);
-        fs << "cameraMatrix" << cameraMatrix;
-        fs << "distCoeffs" << distCoeffs ;                              // text - string sequence
-        fs << "Rotation vector" << R;
-        fs << "Translation vector" << T ;                                           // close sequence
+        fs << "K" << cameraMatrix;
+        fs << "D" << distCoeffs ;                                         // close sequence
         // your own data structures
         fs.release();                                       // explicit close
         std::cout << "Write Done." << std::endl;
