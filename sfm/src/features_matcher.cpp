@@ -82,12 +82,14 @@ void FeatureMatcher::exhaustiveMatching()
             matcher->match ( descriptors_[i], descriptors_[j], matches );
             for (int p = 0; p < matches.size(); ++p)
             {
-                const float ratio = 0.8; // As in Lowe's paper; can be tuned
+                const float ratio = 0.4; // As in Lowe's paper; can be tuned
                 if (matches[p].distance < ratio * matches[p+1].distance)
                 {
                     inlier_matches.push_back(matches[p]);
                 }
             }
+            if(inlier_matches.size()<=10)
+                break;
 
 
             //////////////////////////// Code to be completed (2/5) /////////////////////////////////
