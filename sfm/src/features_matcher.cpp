@@ -69,7 +69,6 @@ void FeatureMatcher::extractFeatures()
         for(int k=0; k<features_[i].size(); k++) {
             cv::Vec3b color = img.at<cv::Vec3b>(features_[i][k].pt);
             feats_colors_[i].push_back(color);
-
         }
 
 

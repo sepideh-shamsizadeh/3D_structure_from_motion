@@ -523,11 +523,14 @@ void BasicSfM::solve()
             }
         }
         cv::Mat E = cv::findEssentialMat(points0, points1, intrinsics_matrix, cv::RANSAC, 0.99, 1, inlier_mask_E);
-        cv::Mat H = cv::findHomography(points0, points1, inlier_mask_H, cv::LMEDS);
-        std::cout<<E<<std::endl;
-        std::cout<<H<<std::endl;
-        std::cout<<"************************"<<std::endl;
+        cv::findHomography(points0, points1, inlier_mask_H, cv::LMEDS);
+        int e = cv::sum(inlier_mask_E)[0];
+        int h =cv::sum(inlier_mask_H)[0];
 
+        if( e>h){
+            cv::recoverPose(E, points0, points1, intrinsics_matrix, init_r_mat,init_t, inlier_mask_E);
+            seed_found = true;
+        }
 
         //////////////////////////// Code to be completed (3/5) /////////////////////////////////
         // Extract both Essential matrix E and Homograph matrix H.
@@ -538,7 +541,7 @@ void BasicSfM::solve()
         // the seed_found flag to true
         // Otherwise, test a different [ref_pose_idx, new_pose_idx] pair (while( !seed_found ) loop)
         // The condition here:
-        if( true ) seed_found = true;
+
         // should be replaced with the criteria described above
         /////////////////////////////////////////////////////////////////////////////////////////
     }
