@@ -489,6 +489,8 @@ void BasicSfM::solve()
 
   while( !seed_found )
   {
+    points0.clear();
+    points1.clear();
     int max_corr = -1;
     for( int r = 0; r < num_poses_; r++ )
     {
@@ -496,13 +498,18 @@ void BasicSfM::solve()
       {
         if( !already_tested_pair(r,c) && corr(r,c) > max_corr )
         {
-          already_tested_pair(r,c) = 1;
           max_corr = corr(r,c);
           ref_pose_idx = r;
           new_pose_idx = c;
         }
       }
     }
+    if( max_corr < 0 )
+    {
+        std::cout<<"No seed pair found, exiting"<<std::endl;
+        return;
+    }
+    already_tested_pair(ref_pose_idx,new_pose_idx) = 1;
 
     for (auto const &co_iter: cam_observation[ref_pose_idx])
     {
@@ -523,9 +530,19 @@ void BasicSfM::solve()
     // the seed_found flag to true
     // Otherwise, test a different [ref_pose_idx, new_pose_idx] pair (while( !seed_found ) loop)
     // The condition here:
+    inlier_mask_E = cv::findEssentialMat(points0, points1, intrinsics_matrix, cv::RANSAC,
+                                         0.999, 1.0, cv::noArray());
+    inlier_mask_H = cv::findHomography	(points0, points1, 0,
+                                           3, cv::noArray(), 2000, 0.995);
+
+    std::cout<<"E"<<cv::sum(inlier_mask_E).val<<endl;
+    std::cout<<"H"<<cv::sum(inlier_mask_H).val<<endl;
+
+    if(cv::sum(inlier_mask_E).val>cv::sum(inlier_mask_H).val){    std::cout<<"Eeeeeeeeeeeeeeee"<<endl;}
     if( true ) seed_found = true;
     // should be replaced with the criteria described above
     /////////////////////////////////////////////////////////////////////////////////////////
+
   }
 
   // Initialize the first optimized poses, by integrating them into the registration

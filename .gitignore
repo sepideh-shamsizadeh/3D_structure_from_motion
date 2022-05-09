@@ -35,3 +35,8 @@ Lab2 - Structure from Motion.pdf
 cmake-build-debug/
 datasets/
 sfm/.gitignore
+sfm/data.txt	
+sfm/data1.txt
+sfm/data2.txt
+sfm/data3.txt
+sfm/data.txt

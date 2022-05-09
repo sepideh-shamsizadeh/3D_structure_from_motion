@@ -41,24 +41,42 @@ cv::Mat FeatureMatcher::readUndistortedImage(const std::string& filename )
 
 void FeatureMatcher::extractFeatures()
 {
+
     features_.resize(images_names_.size());
     descriptors_.resize(images_names_.size());
     feats_colors_.resize(images_names_.size());
-    cv::Ptr<cv::FeatureDetector> detector = cv::ORB::create();
-    cv::Ptr<cv::DescriptorExtractor> descriptor = cv::ORB::create();
-
-
 
     for( int i = 0; i < images_names_.size(); i++  )
+
     {
         std::cout<<"Computing descriptors for image "<<i<<std::endl;
         cv::Mat img = readUndistortedImage(images_names_[i]);
-        detector->detect ( img,features_[i] );
-        descriptor->compute( img, features_[i], descriptors_[i] );
-        cv::Mat outimg1;
-        drawKeypoints( img, features_[i], outimg1, cv::Scalar::all(-1), cv::DrawMatchesFlags::DEFAULT );
+
+        std::vector< std::vector<cv::Vec3b > > feats_colors;
+
+        std::vector< std::vector<cv::KeyPoint> > features;
+
+        std::vector< cv::Mat > descriptors;
+
+        cv::Ptr<cv::FeatureDetector> detector = cv::ORB::create();
+        cv::Ptr<cv::DescriptorExtractor> descriptor = cv::ORB::create();
+
+
+
+        detector->detect ( img,features_[i]);
+
+        descriptor->compute (img, features_[i], descriptors_[i]);
         cv::Vec3b color = img.at<cv::Vec3b>(features_[i].data()->pt.x, features_[i].data()->pt.y);
         feats_colors_[i].push_back(color);
+
+
+//      Mat outimg_1;
+//      cv::drawKeypoints( img, features_[i], outimg_1, Scalar::all(-1), DrawMatchesFlags::DEFAULT );
+//      imshow("ORB",outimg_1);
+//      waitKey(0);
+
+
+
 
         //////////////////////////// Code to be completed (1/1) /////////////////////////////////
         // Extract salient points + descriptors from i-th image, and store them into
@@ -68,6 +86,7 @@ void FeatureMatcher::extractFeatures()
         /////////////////////////////////////////////////////////////////////////////////////////
     }
 }
+
 
 void FeatureMatcher::exhaustiveMatching()
 {
@@ -94,12 +113,12 @@ void FeatureMatcher::exhaustiveMatching()
             if(inlier_matches.size()<=10)
                 break;
 
-            cv::Mat img_matches;
-            cv::drawMatches( img1, features_[i], img2, features_[j], inlier_matches, img_matches, cv::Scalar::all(-1),
-                         cv::Scalar::all(-1), std::vector<char>(), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
-            //-- Show detected matches
-            imshow("Good Matches", img_matches );
-            cv::waitKey(0);
+//            cv::Mat img_matches;
+//            cv::drawMatches( img1, features_[i], img2, features_[j], inlier_matches, img_matches, cv::Scalar::all(-1),
+//                         cv::Scalar::all(-1), std::vector<char>(), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
+//            //-- Show detected matches
+//            imshow("Good Matches", img_matches );
+//            cv::waitKey(0);
             intrinsics_matrix_ = new_intrinsics_matrix_;
 
             //////////////////////////// Code to be completed (2/5) /////////////////////////////////
