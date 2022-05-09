@@ -69,10 +69,8 @@ void FeatureMatcher::extractFeatures()
         for(int k=0; k<features_[i].size(); k++) {
             cv::Vec3b color = img.at<cv::Vec3b>(features_[i][k].pt);
             feats_colors_[i].push_back(color);
-            std::cout << "colors"<<i << color << std::endl;
+
         }
-
-
 
 
         //////////////////////////// Code to be completed (1/1) /////////////////////////////////
@@ -106,6 +104,7 @@ void FeatureMatcher::exhaustiveMatching()
                     inlier_matches.push_back(matches[p]);
                 }
             }
+            std::cout<<"i,j"<<i<<j<<std::endl;
 
             if(inlier_matches.size()<=10)
                 break;
