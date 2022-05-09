@@ -66,14 +66,11 @@ void FeatureMatcher::extractFeatures()
         detector->detect ( img,features_[i]);
 
         descriptor->compute (img, features_[i], descriptors_[i]);
-        cv::Vec3b color = img.at<cv::Vec3b>(features_[i].data()->pt.x, features_[i].data()->pt.y);
-        feats_colors_[i].push_back(color);
-
-
-//      Mat outimg_1;
-//      cv::drawKeypoints( img, features_[i], outimg_1, Scalar::all(-1), DrawMatchesFlags::DEFAULT );
-//      imshow("ORB",outimg_1);
-//      waitKey(0);
+        for(int k=0; k<features_[i].size(); k++) {
+            cv::Vec3b color = img.at<cv::Vec3b>(features_[i][k].pt);
+            feats_colors_[i].push_back(color);
+            std::cout << "colors"<<i << color << std::endl;
+        }
 
 
 
