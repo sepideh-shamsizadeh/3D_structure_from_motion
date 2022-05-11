@@ -800,8 +800,8 @@ void BasicSfM::bundleAdjustmentIter( int new_cam_idx )
                         *observation = observations_.data() + (i_obs * 2);
                 ceres::CostFunction* cost_function =
                         ReprojectionError::Create(
-                                observation[2 * pose_index_[i_obs] + 0],
-                                observation[2 * pose_index_[i_obs] + 1]);
+                                observation[0],
+                                observation[1]);
 
                 problem.AddResidualBlock(cost_function,
                                          new ceres::CauchyLoss(2*max_reproj_err_),

@@ -103,7 +103,6 @@ void FeatureMatcher::exhaustiveMatching()
                     inlier_matches.push_back(matches[p]);
                 }
             }
-            std::cout<<"i,j"<<i<<j<<std::endl;
 
             if(inlier_matches.size()<=10)
                 break;
