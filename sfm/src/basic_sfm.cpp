@@ -810,15 +810,27 @@ void BasicSfM::bundleAdjustmentIter( int new_cam_idx )
             //.. check if this observation has bem already registered (bot checking camera pose and point pose)
             if( pose_optim_iter_[pose_index_[i_obs]] > 0 && pts_optim_iter_[point_index_[i_obs]] > 0 )
             {
+
+                auto b = parameters_.data()[i_obs] + camera_block_size_ * i_obs;
+                auto e = b + camera_block_size_;
+                std::cout<<"b)"<<b<<std::endl;
+                std::cout<<"e"<<e<<std::endl;
+                std::vector<double> camera;
+                for (auto i=b; i<e; i++) {
+                    camera.push_back(parameters_[i]);
+                    std::cout<<"camera)"<<camera[i]<<std::endl;
+                }
+                std::cout<<"*******************"<<std::endl;
+                std::cout<<"pointBlockPtr (point_index_[i_obs]))"<<pointBlockPtr (point_index_[i_obs])<<std::endl;
+
                 ceres::CostFunction* cost_function =
                         ReprojectionError::Create(
                                 observations_[2 * i_obs + 0],
                                 observations_[2 * i_obs + 1]);
-                
+
                 problem.AddResidualBlock(cost_function,
                                          new ceres::CauchyLoss(2*max_reproj_err_),
-                                         parameters_.data() + camera_block_size_ * i_obs,
-                                         parameters_.data() + point_block_size_ * i_obs);
+                                         parameters_.data()+ camera_block_size_ * i_obs);
                 //////////////////////////// Code to be completed (4/5) /////////////////////////////////
                 //.. in case, add a residual block inside the Ceres solver problem.
                 // You should define a suitable functor (i.e., see the ReprojectionError struct at the
