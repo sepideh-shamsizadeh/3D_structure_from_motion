@@ -62,7 +62,7 @@ void FeatureMatcher::extractFeatures()
         cv::Ptr<cv::xfeatures2d::SURF> detector = cv::xfeatures2d::SURF::create( minHessian );
         cv::Mat descriptor;
         detector->detectAndCompute( img, cv::noArray(), features_[i], descriptor );
-
+        descriptors_[i].push_back(descriptor);
         for(int k=0; k<features_[i].size(); k++) {
             cv::Vec3b color = img.at<cv::Vec3b>(features_[i][k].pt);
             feats_colors_[i].push_back(color);
@@ -89,17 +89,26 @@ void FeatureMatcher::exhaustiveMatching()
             cv:: Mat img1 = readUndistortedImage(images_names_[i]);
             cv:: Mat img2 = readUndistortedImage(images_names_[j]);
             std::cout<<"Matching image "<<i<<" with image "<<j<<std::endl;
-            std::vector<cv::DMatch> matches, inlier_matches;
-            //BFMatcher matcher ( NORM_HAMMING );
-            matcher->match ( descriptors_[i], descriptors_[j], matches );
-            for (int p = 0; p < matches.size(); ++p)
+            cv::Ptr<cv::DescriptorMatcher> matcher = cv::DescriptorMatcher::create(cv::DescriptorMatcher::FLANNBASED);
+            std::vector< std::vector<cv::DMatch> > knn_matches;
+            matcher->knnMatch( descriptors_[i], descriptors_[j], knn_matches, 2 );
+            //-- Filter matches using the Lowe's ratio test
+            const float ratio_thresh = 0.8f;
+            std::vector<cv::DMatch> inlier_matches;
+            for (size_t i = 0; i < knn_matches.size(); i++)
             {
-                const float ratio = 0.4; // As in Lowe's paper; can be tuned
-                if (matches[p].distance < ratio * matches[p+1].distance)
+                if (knn_matches[i][0].distance < ratio_thresh * knn_matches[i][1].distance)
                 {
-                    inlier_matches.push_back(matches[p]);
+                    inlier_matches.push_back(knn_matches[i][0]);
                 }
             }
+            //-- Draw matches
+            cv::Mat img_matches;
+            drawMatches( img1, features_[i], img2, features_[j], inlier_matches, img_matches, cv::Scalar::all(-1),
+                         cv::Scalar::all(-1), std::vector<char>(), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
+            //-- Show detected matches
+            imshow("Good Matches", img_matches );
+            cv::waitKey();
 
             if(inlier_matches.size()<=10)
                 break;
