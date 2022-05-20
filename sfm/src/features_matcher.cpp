@@ -6,7 +6,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/opencv.hpp>
-#include "opencv2/features2d.hpp"
+#include <opencv2/features2d.hpp>
+#include <opencv2/xfeatures2d.hpp>
 
 namespace
 {
@@ -57,15 +58,11 @@ void FeatureMatcher::extractFeatures()
         std::vector< std::vector<cv::KeyPoint> > features;
 
         std::vector< cv::Mat > descriptors;
+        int minHessian = 400;
+        cv::Ptr<cv::xfeatures2d::SURF> detector = cv::xfeatures2d::SURF::create( minHessian );
+        cv::Mat descriptor;
+        detector->detectAndCompute( img, cv::noArray(), features_[i], descriptor );
 
-        cv::Ptr<cv::FeatureDetector> detector = cv::ORB::create();
-        cv::Ptr<cv::DescriptorExtractor> descriptor = cv::ORB::create();
-
-
-
-        detector->detect ( img,features_[i]);
-
-        descriptor->compute (img, features_[i], descriptors_[i]);
         for(int k=0; k<features_[i].size(); k++) {
             cv::Vec3b color = img.at<cv::Vec3b>(features_[i][k].pt);
             feats_colors_[i].push_back(color);

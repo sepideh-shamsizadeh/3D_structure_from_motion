@@ -42,3 +42,5 @@ sfm/data3.txt
 sfm/data.txt
 sfm/x.ply
 sfm/out_data2.txt
+sfm/bin/
+sfm/build/
