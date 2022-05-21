@@ -553,10 +553,9 @@ void BasicSfM::solve()
             }
         }
         cv::Mat E = cv::findEssentialMat(points0, points1, intrinsics_matrix, cv::RANSAC, 0.99, 1, inlier_mask_E);
-        cv::findHomography(points0, points1, inlier_mask_H, cv::LMEDS);
+        cv::Mat H = cv::findHomography(points0, points1, inlier_mask_H, cv::RANSAC);
         int e = cv::sum(inlier_mask_E)[0];
         int h = cv::sum(inlier_mask_H)[0];
-
         if( e>h){
             cv::recoverPose(E, points0, points1, intrinsics_matrix, init_r_mat,init_t, inlier_mask_E);
             seed_found = true;
@@ -789,14 +788,13 @@ void BasicSfM::bundleAdjustmentIter( int new_cam_idx )
 
         ceres::Problem problem;
         // For each observation....
-        int c= 0;
         for( int i_obs = 0; i_obs < num_observations_; i_obs++ )
         {
             //.. check if this observation has bem already registered (bot checking camera pose and point pose)
             if( pose_optim_iter_[pose_index_[i_obs]] > 0 && pts_optim_iter_[point_index_[i_obs]] > 0 )
             {
-                double *camera = cameraBlockPtr (pose_index_[i_obs]),
-                        *point = pointBlockPtr (point_index_[i_obs]),
+                double *camera = (parameters_.data()) + (pose_index_[i_obs]* camera_block_size_ ),
+                        *point = (parameters_.data()) + (num_poses_ * camera_block_size_ +point_index_[i_obs] * point_block_size_ ),
                         *observation = observations_.data() + (i_obs * 2);
                 ceres::CostFunction* cost_function =
                         ReprojectionError::Create(
@@ -819,7 +817,6 @@ void BasicSfM::bundleAdjustmentIter( int new_cam_idx )
                 //////////////////////////////////////////////////////////////////////////////////
             }
         }
-        std::cout<<"c"<<c<<std::endl;
         ceres::Solver::Summary summary;
         Solve(options, &problem, &summary);
 //    if( verbosity_level_ > 2)

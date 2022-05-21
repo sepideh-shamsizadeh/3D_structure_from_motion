@@ -2,7 +2,6 @@
 #include <iostream>
 #include <map>
 #include <opencv2/imgproc.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/opencv.hpp>
@@ -52,11 +51,6 @@ void FeatureMatcher::extractFeatures()
     {
         std::cout<<"Computing descriptors for image "<<i<<std::endl;
         cv::Mat img = readUndistortedImage(images_names_[i]);
-
-        std::vector< std::vector<cv::Vec3b > > feats_colors;
-
-        std::vector< std::vector<cv::KeyPoint> > features;
-
         std::vector< cv::Mat > descriptors;
         int minHessian = 400;
         cv::Ptr<cv::xfeatures2d::SURF> detector = cv::xfeatures2d::SURF::create( minHessian );
@@ -67,7 +61,6 @@ void FeatureMatcher::extractFeatures()
             cv::Vec3b color = img.at<cv::Vec3b>(features_[i][k].pt);
             feats_colors_[i].push_back(color);
         }
-
 
         //////////////////////////// Code to be completed (1/1) /////////////////////////////////
         // Extract salient points + descriptors from i-th image, and store them into
@@ -88,7 +81,6 @@ void FeatureMatcher::exhaustiveMatching()
         {
             cv:: Mat img1 = readUndistortedImage(images_names_[i]);
             cv:: Mat img2 = readUndistortedImage(images_names_[j]);
-            std::cout<<"Matching image "<<i<<" with image "<<j<<std::endl;
             cv::Ptr<cv::DescriptorMatcher> matcher = cv::DescriptorMatcher::create(cv::DescriptorMatcher::FLANNBASED);
             std::vector< std::vector<cv::DMatch> > knn_matches;
             matcher->knnMatch( descriptors_[i], descriptors_[j], knn_matches, 2 );
@@ -113,12 +105,6 @@ void FeatureMatcher::exhaustiveMatching()
             if(inlier_matches.size()<=10)
                 break;
 
-//            cv::Mat img_matches;
-//            cv::drawMatches( img1, features_[i], img2, features_[j], inlier_matches, img_matches, cv::Scalar::all(-1),
-//                         cv::Scalar::all(-1), std::vector<char>(), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
-//            //-- Show detected matches
-//            imshow("Good Matches", img_matches );
-//            cv::waitKey(0);
             intrinsics_matrix_ = new_intrinsics_matrix_;
 
             //////////////////////////// Code to be completed (2/5) /////////////////////////////////
