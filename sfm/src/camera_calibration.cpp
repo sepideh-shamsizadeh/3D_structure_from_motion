@@ -31,7 +31,7 @@ int main()
     // Extracting path of individual image stored in a given directory
     std::vector<cv::String> images;
     // Path of the folder containing checkerboard images
-    std::string path = "../images/*.jpg";
+    std::string path = "../datasets/caliberation/*.jpg";
 
     cv::glob(path, images);
 
@@ -85,21 +85,24 @@ int main()
     std::cout << "Rotation vector : " << R << std::endl;
     std::cout << "Translation vector : " << T << std::endl;
 
-    cv::Mat image_result = cv::imread("../test1.png");
-    cv::imshow("original undistorted", image_result);
-    cv::Mat imageUndistorted, new_camera_matrix;
-    cv::Size imageSize(cv::Size(image_result.cols,image_result.rows));
-    new_camera_matrix = cv::getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0);
-    cv::undistort( image_result, imageUndistorted, new_camera_matrix, distCoeffs, new_camera_matrix );
-
-    cv::imshow("original image", imageUndistorted);
-    cv::waitKey(0);
-    std::string filename = "../../configs/3dp_cam.yml";
+//    cv::Mat image_result = cv::imread("../test1.png");
+//    cv::imshow("original undistorted", image_result);
+//    cv::Mat imageUndistorted, new_camera_matrix;
+//    cv::Size imageSize(cv::Size(image_result.cols,image_result.rows));
+//    new_camera_matrix = cv::getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0);
+//    cv::undistort( image_result, imageUndistorted, new_camera_matrix, distCoeffs, new_camera_matrix );
+//
+//    cv::imshow("original image", imageUndistorted);
+//    cv::waitKey(0);
+    std::string filename = "../3dp_cam.yml";
     { //write
         cv::FileStorage fs(filename, cv::FileStorage::WRITE);
         // or:
         // FileStorage fs;
         // fs.open(filename, FileStorage::WRITE);
+
+        fs << "width" << gray.cols;
+        fs << "height" << gray.rows;
         fs << "K" << cameraMatrix;
         fs << "D" << distCoeffs ;                                         // close sequence
         // your own data structures

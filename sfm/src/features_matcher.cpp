@@ -51,11 +51,11 @@ void FeatureMatcher::extractFeatures()
     {
         std::cout<<"Computing descriptors for image "<<i<<std::endl;
         cv::Mat img = readUndistortedImage(images_names_[i]);
-        std::vector< cv::Mat > descriptors;
-        int minHessian = 400;
-        cv::Ptr<cv::xfeatures2d::SURF> detector = cv::xfeatures2d::SURF::create( minHessian );
+        cv::Ptr<cv::SiftFeatureDetector> detector = cv::SiftFeatureDetector::create();
         cv::Mat descriptor;
-        detector->detectAndCompute( img, cv::noArray(), features_[i], descriptor );
+        cv::DescriptorExtractor* extractor = new cv::SiftDescriptorExtractor();
+        detector->detect(img, features_[i]);
+        extractor->compute(img, features_[i], descriptor);
         descriptors_[i].push_back(descriptor);
         for(int k=0; k<features_[i].size(); k++) {
             cv::Vec3b color = img.at<cv::Vec3b>(features_[i][k].pt);
@@ -74,19 +74,19 @@ void FeatureMatcher::extractFeatures()
 
 void FeatureMatcher::exhaustiveMatching()
 {
-    cv::Ptr<cv::DescriptorMatcher> matcher  = cv::DescriptorMatcher::create ( "BruteForce-Hamming" );
     for( int i = 0; i < images_names_.size() - 1; i++ )
     {
         for( int j = i + 1; j < images_names_.size(); j++ )
         {
+            std::cout<<"Matching image "<<i<<" with image "<<j<<std::endl;
+            std::vector<cv::DMatch> inlier_matches;
             cv:: Mat img1 = readUndistortedImage(images_names_[i]);
             cv:: Mat img2 = readUndistortedImage(images_names_[j]);
             cv::Ptr<cv::DescriptorMatcher> matcher = cv::DescriptorMatcher::create(cv::DescriptorMatcher::FLANNBASED);
             std::vector< std::vector<cv::DMatch> > knn_matches;
             matcher->knnMatch( descriptors_[i], descriptors_[j], knn_matches, 2 );
             //-- Filter matches using the Lowe's ratio test
-            const float ratio_thresh = 0.8f;
-            std::vector<cv::DMatch> inlier_matches;
+            const float ratio_thresh = 0.5f;
             for (size_t i = 0; i < knn_matches.size(); i++)
             {
                 if (knn_matches[i][0].distance < ratio_thresh * knn_matches[i][1].distance)
@@ -94,13 +94,6 @@ void FeatureMatcher::exhaustiveMatching()
                     inlier_matches.push_back(knn_matches[i][0]);
                 }
             }
-            //-- Draw matches
-            cv::Mat img_matches;
-            drawMatches( img1, features_[i], img2, features_[j], inlier_matches, img_matches, cv::Scalar::all(-1),
-                         cv::Scalar::all(-1), std::vector<char>(), cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
-            //-- Show detected matches
-            imshow("Good Matches", img_matches );
-            cv::waitKey();
 
             if(inlier_matches.size()<=10)
                 break;
