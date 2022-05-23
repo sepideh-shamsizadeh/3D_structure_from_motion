@@ -1,7 +1,10 @@
 file(REMOVE_RECURSE
   "CMakeFiles/sfm.dir/src/basic_sfm.cpp.o"
+  "CMakeFiles/sfm.dir/src/basic_sfm.cpp.o.d"
   "CMakeFiles/sfm.dir/src/features_matcher.cpp.o"
+  "CMakeFiles/sfm.dir/src/features_matcher.cpp.o.d"
   "CMakeFiles/sfm.dir/src/io_utils.cpp.o"
+  "CMakeFiles/sfm.dir/src/io_utils.cpp.o.d"
   "libsfm.a"
   "libsfm.pdb"
 )

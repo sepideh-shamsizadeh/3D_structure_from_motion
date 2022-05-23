@@ -1,4 +1,4 @@
-/snap/clion/189/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/snap/clion/189/bin/ninja/linux/ninja -G Ninja -S /home/somayeh/CLionProjects/3Dprocessing/3D_structure_from_motion/sfm -B /home/somayeh/CLionProjects/3Dprocessing/3D_structure_from_motion/sfm/cmake-build-debug
+/snap/clion/190/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/snap/clion/190/bin/ninja/linux/ninja -G Ninja -S /home/somayeh/CLionProjects/3Dprocessing/3D_structure_from_motion/sfm -B /home/somayeh/CLionProjects/3Dprocessing/3D_structure_from_motion/sfm/cmake-build-debug
 -- The C compiler identification is GNU 9.4.0
 -- The CXX compiler identification is GNU 9.4.0
 -- Detecting C compiler ABI info
