@@ -30,8 +30,31 @@
 *.exe
 *.out
 *.app
+
 Lab2 - Structure from Motion.pdf
 datasets/
 
 .idea/
 sfm/cmake-build-debug/
+.idea/
+Lab2 - Structure from Motion.pdf
+cmake-build-debug/
+datasets/
+sfm/.gitignore
+sfm/data.txt	
+sfm/data1.txt
+sfm/data2.txt
+sfm/data3.txt
+sfm/data.txt
+sfm/x.ply
+sfm/out_data2.txt
+sfm/bin/
+sfm/build/
+
+sfm/out_data1.txt
+sfm/y.ply
+sfm/y1.ply
+sfm/y2.ply
+sfm/y3.ply
+
+
